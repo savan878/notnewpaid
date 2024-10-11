@@ -57,6 +57,10 @@ def check_license(key, username):
                 return True
             else:
                 return "License key is already in use by another user"
+        else:
+            del active_keys[key]
+            save_keys(active_keys)
+            return False
     return False
 
 @bot.message_handler(commands=['start'])
@@ -100,6 +104,8 @@ def multithread_starter(key, username):
     result = check_license(key, username)
     if result == True:
         print("License key verified. Starting the script...")
+        if not os.path.exists("sessions"):
+            os.mkdir("sessions")
         dirs = os.listdir("sessions/")
         sessions = list(filter(lambda x: x.endswith(".session"), dirs))
         sessions = list(map(lambda x: x.split(".session")[0], sessions))
@@ -141,6 +147,8 @@ def reset_api_credentials():
         print("[!] No env.txt file found. Nothing to reset.")
 
 def reset_session():
+    if not os.path.exists("sessions"):
+        os.mkdir("sessions")
     sessions = [f for f in os.listdir("sessions/") if f.endswith(".session")]
     if not sessions:
         print("[!] No sessions found.")
@@ -179,7 +187,7 @@ def process():
      ██ ██   ██  ██  ██  ██   ██ ██  ██ ██ 
 ███████ ██   ██   ████   ██   ██ ██   ████ 
                                                 
-            NotPx Auto Paint & Claim by @savanop - v1.0 {}""".format(Colors.BLUE, Colors.END))
+            NotPx Auto Paint & Claim by @sgr - v1.0 {}""".format(Colors.BLUE, Colors.END))
     
     print("Starting Telegram bot...")
     bot_thread = threading.Thread(target=bot.polling, kwargs={"none_stop": True})
@@ -210,6 +218,8 @@ def process():
         
         if option == "1":
             name = input("\nEnter Session name: ")
+            if not os.path.exists("sessions"):
+                os.mkdir("sessions")
             if not any(name in i for i in os.listdir("sessions/")):
                 api_id, api_hash = load_api_credentials()
                 if api_id and api_hash:
